@@ -32,7 +32,7 @@ where id = (select id from auth.users where email = 'ob2380@columbia.edu');
 
 1. Run `supabase/migrations/20261012_week6_admin.sql` in the Supabase SQL Editor.
 2. Optional: run `supabase/seed/20261012_demo_data.sql` for demo voters, images, captions and votes (all marked `is_seed`; the cleanup SQL is at the bottom of that file).
-3. Env vars (Vercel and `.env.local`):
+3. Env vars are optional: `src/lib/supabase/config.ts` defaults to this project's public URL and publishable key. Override with:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 4. Supabase → Authentication → URL Configuration → Redirect URLs: add `https://<your-admin-domain>/auth/callback`.
