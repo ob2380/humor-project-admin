@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+/*
+  Laugh Track — admin for The Humor Project.
+  Ink-on-paper instrument panel. The only saturated color is the vote itself:
+  blue = upvote, red = downvote (a diverging pair with a gray midpoint).
+*/
+:root {
+  color-scheme: light;
+  --paper: #f3f4f6;
+  --surface: #fcfcfb;
+  --surface-2: #f0f1f3;
+  --ink: #14161b;
+  --ink-2: #4c505a;
+  --muted: #80848d;
+  --line: #e1e3e8;
+  --axis: #c3c5cc;
+  --up: #2a78d6;
+  --up-soft: #cde2fb;
+  --down: #e34948;
+  --down-soft: #f9d4d3;
+  --mid: #e7e6e2;
+  --focus: #2a78d6;
+  --danger: #c23434;
+  --seed: #8a6a00;
+  --seed-bg: #fdf3d1;
+  --seq-0: #eef4fc;
+  --seq-1: #cde2fb;
+  --seq-2: #9ec5f4;
+  --seq-3: #6da7ec;
+  --seq-4: #3987e5;
+  --seq-5: #256abf;
+  --seq-6: #184f95;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #0f1013;
+    --surface: #18191d;
+    --surface-2: #202227;
+    --ink: #f0efec;
+    --ink-2: #c3c2b7;
+    --muted: #8d8f96;
+    --line: #2b2d33;
+    --axis: #3a3c43;
+    --up: #3987e5;
+    --up-soft: #1c3557;
+    --down: #e66767;
+    --down-soft: #4a2526;
+    --mid: #383835;
+    --focus: #6da7ec;
+    --danger: #e66767;
+    --seed: #f0c64a;
+    --seed-bg: #3a2f0b;
+    --seq-0: #1d2026;
+    --seq-1: #13294a;
+    --seq-2: #184f95;
+    --seq-3: #1c5cab;
+    --seq-4: #2a78d6;
+    --seq-5: #5598e7;
+    --seq-6: #9ec5f4;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-up: var(--up);
+  --color-up-soft: var(--up-soft);
+  --color-down: var(--down);
+  --color-down-soft: var(--down-soft);
+  --color-mid: var(--mid);
+  --color-danger: var(--danger);
+  --color-seed: var(--seed);
+  --color-seed-bg: var(--seed-bg);
+  --font-sans: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
+}
+
+html {
+  background: var(--paper);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.02em;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.field {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  color: var(--ink);
+}
+.field:focus {
+  outline: 2px solid var(--focus);
+  outline-offset: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--ink);
+  color: var(--surface);
+}
+.btn-primary:hover {
+  opacity: 0.88;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+.btn-ghost:hover {
+  background: var(--surface-2);
+}
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: color-mix(in oklab, var(--danger) 35%, transparent);
+}
+.btn-danger:hover {
+  background: color-mix(in oklab, var(--danger) 10%, transparent);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.data-table th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink-2);
+  font-size: 13px;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+.data-table tr:last-child td {
+  border-bottom: 0;
+}
+.data-table tbody tr:hover {
+  background: var(--surface-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
