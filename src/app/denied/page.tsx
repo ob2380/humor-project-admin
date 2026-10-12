@@ -9,8 +9,8 @@ export default async function DeniedPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase.from("profiles").select("is_superadmin").eq("id", user.id).maybeSingle();
-  if (profile?.is_superadmin) redirect("/");
+  const { data: isAdmin } = await supabase.rpc("is_superadmin");
+  if (isAdmin === true) redirect("/");
 
   return (
     <main className="min-h-screen grid place-items-center px-4 py-16">

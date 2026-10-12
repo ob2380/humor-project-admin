@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
-import { PROFILE_COLS, displayName, fetchAll, type Profile } from "@/lib/data";
+import { displayName, fetchProfiles } from "@/lib/data";
 import { PageHeader, Empty, Avatar, fmtDate, pct } from "@/components/ui";
 
 const PAGE = 50;
@@ -12,7 +12,7 @@ type Row = {
   caption_id: number;
   profile_id: string;
   captions: { caption_text: string } | null;
-  profiles: { first_name: string | null; last_name: string | null; email: string | null; avatar_url: string | null } | null;
+  profiles: { first_name: string | null; last_name: string | null; avatar_url: string | null } | null;
 };
 
 export default async function VotesPage({
@@ -30,7 +30,7 @@ export default async function VotesPage({
   let query = supabase
     .from("caption_votes")
     .select(
-      "id, vote_value, created_at, caption_id, profile_id, captions(caption_text), profiles(first_name, last_name, email, avatar_url)",
+      "id, vote_value, created_at, caption_id, profile_id, captions(caption_text), profiles(first_name, last_name, avatar_url)",
       { count: "exact" },
     )
     .order("created_at", { ascending: false })
@@ -51,10 +51,11 @@ export default async function VotesPage({
     query,
     countFor(1),
     countFor(-1),
-    fetchAll<Profile>(supabase, "profiles", PROFILE_COLS, "created_at"),
+    fetchProfiles(supabase),
   ]);
   if (error) throw new Error(error.message);
   const rows = (data ?? []) as unknown as Row[];
+  const emailById = new Map(profiles.map((p) => [p.id, p.email]));
   const up = upRes.count ?? 0;
   const down = downRes.count ?? 0;
   const pages = Math.max(1, Math.ceil((count ?? 0) / PAGE));
@@ -133,7 +134,7 @@ export default async function VotesPage({
             </thead>
             <tbody>
               {rows.map((r) => {
-                const name = displayName(r.profiles);
+                const name = displayName(r.profiles ? { ...r.profiles, email: emailById.get(r.profile_id) ?? null } : null);
                 return (
                   <tr key={r.id}>
                     <td>

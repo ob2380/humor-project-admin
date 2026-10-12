@@ -1,7 +1,8 @@
 -- Demo data for the Week 6 admin dashboard.
 -- Every row this creates is marked is_seed = true (or uses an @seed.laughtrack.test email),
 -- the dashboard can hide it with "Real activity only", and the block at the bottom removes it.
--- Run AFTER 20261012_week6_admin.sql.
+-- Run AFTER 20261012_week6_admin.sql and 20261012_week6_public_app_compat.sql.
+-- Demo rows are visible only to superadmins (RLS), so they never reach the public app.
 
 begin;
 select setseed(0.42);
@@ -95,7 +96,7 @@ create temporary table seed_voters on commit drop as
 select p.id as profile_id, (random() * 2.4 - 1.2) as leniency, (0.45 + random() * 0.45) as activity
 from public.profiles p where p.is_seed;
 
-insert into public.caption_votes (caption_id, profile_id, vote_value, created_at)
+insert into public.caption_votes (caption_id, profile_id, vote_value, created_at, is_seed)
 select q.caption_id, v.profile_id,
        case when random() < 1 / (1 + exp(-(q.quality + v.leniency))) then 1 else -1 end,
        least(
@@ -104,7 +105,8 @@ select q.caption_id, v.profile_id,
          date_trunc('day', q.created_at + (random() ^ 2) * (now() - q.created_at)) + interval '4 hours'
            + make_interval(hours => (array[9,11,12,13,14,15,16,17,18,19,20,20,21,21,22,22,22,23,23,0,0,1,1,2])[1 + floor(random() * 24)::int],
                            mins  => floor(random() * 60)::int))
-       )
+       ),
+       true
 from seed_quality q
 cross join seed_voters v
 where random() < v.activity

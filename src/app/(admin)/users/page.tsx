@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
-import { PROFILE_COLS, VOTE_COLS, fetchAll, type Profile, type Vote } from "@/lib/data";
+import { VOTE_COLS, fetchAll, fetchProfiles, type Vote } from "@/lib/data";
 import { scoreVoters } from "@/lib/stats";
 import { PageHeader, Empty, Avatar, SeedBadge, fmtDate, pct } from "@/components/ui";
 import { SplitBar } from "@/components/charts/split-bar";
@@ -15,7 +15,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
   const sort: Sort = sp.sort && sp.sort in SORTS ? (sp.sort as Sort) : "recent";
 
   const [profiles, votes] = await Promise.all([
-    fetchAll<Profile>(supabase, "profiles", PROFILE_COLS, "created_at"),
+    fetchProfiles(supabase),
     fetchAll<Vote>(supabase, "caption_votes", VOTE_COLS),
   ]);
   const meta = new Map(profiles.map((p) => [p.id, p]));

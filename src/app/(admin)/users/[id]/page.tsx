@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
-import { CAPTION_COLS, PROFILE_COLS, VOTE_COLS, displayName, fetchAll, type Caption, type Profile, type Vote } from "@/lib/data";
+import { CAPTION_COLS, VOTE_COLS, displayName, fetchAll, fetchProfiles, type Caption, type Vote } from "@/lib/data";
 import { scoreCaptions } from "@/lib/stats";
 import { Avatar, SeedBadge, fmtDate, pct, Section, Empty } from "@/components/ui";
 import { SplitBar } from "@/components/charts/split-bar";
@@ -11,7 +11,7 @@ export default async function UserDetail({ params }: { params: Promise<{ id: str
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
 
-  const { data: profile } = await supabase.from("profiles").select(PROFILE_COLS).eq("id", id).maybeSingle<Profile>();
+  const profile = (await fetchProfiles(supabase)).find((p) => p.id === id);
   if (!profile) notFound();
 
   const [mine, captions, allVotes] = await Promise.all([

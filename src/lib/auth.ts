@@ -26,15 +26,21 @@ export const requireAdmin = cache(async () => {
 
   if (!user) redirect("/login");
 
+  const { data: isAdmin } = await supabase.rpc("is_superadmin");
+  if (isAdmin !== true) redirect("/denied");
+
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, email, first_name, last_name, avatar_url, is_superadmin")
+    .select("id, first_name, last_name, avatar_url")
     .eq("id", user.id)
     .maybeSingle();
 
-  if (!profile?.is_superadmin) redirect("/denied");
-
-  const { is_superadmin: _flag, ...rest } = profile;
-  void _flag;
+  const rest = {
+    id: user.id,
+    email: user.email ?? null,
+    first_name: profile?.first_name ?? null,
+    last_name: profile?.last_name ?? null,
+    avatar_url: profile?.avatar_url ?? null,
+  };
   return { supabase, user, profile: rest as AdminProfile };
 });

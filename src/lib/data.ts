@@ -42,6 +42,7 @@ export type Vote = {
   profile_id: string;
   vote_value: 1 | -1;
   created_at: string;
+  is_seed: boolean;
 };
 
 /** PostgREST caps responses at 1000 rows; page through so stats see every row. */
@@ -66,17 +67,21 @@ export async function fetchAll<T>(
   return rows;
 }
 
-export const PROFILE_COLS =
-  "id, email, first_name, last_name, avatar_url, is_superadmin, is_seed, created_at";
+/** Every profile with its email and flags. admin_profiles() raises unless the caller is a superadmin. */
+export async function fetchProfiles(supabase: SupabaseClient): Promise<Profile[]> {
+  const { data, error } = await supabase.rpc("admin_profiles");
+  if (error) throw new Error(`Couldn't read profiles: ${error.message}`);
+  return (data ?? []) as Profile[];
+}
 export const IMAGE_COLS =
   "id, url, storage_path, description, model, prompt, is_seed, created_at, updated_at";
 export const CAPTION_COLS =
   "id, caption_text, image_description, image_id, model, prompt, is_seed, created_at, updated_at";
-export const VOTE_COLS = "id, caption_id, profile_id, vote_value, created_at";
+export const VOTE_COLS = "id, caption_id, profile_id, vote_value, created_at, is_seed";
 
 export async function loadEverything(supabase: SupabaseClient) {
   const [profiles, images, captions, votes] = await Promise.all([
-    fetchAll<Profile>(supabase, "profiles", PROFILE_COLS, "created_at"),
+    fetchProfiles(supabase),
     fetchAll<ImageRow>(supabase, "images", IMAGE_COLS),
     fetchAll<Caption>(supabase, "captions", CAPTION_COLS),
     fetchAll<Vote>(supabase, "caption_votes", VOTE_COLS),
@@ -94,7 +99,7 @@ export function scopeDataset(d: Dataset, realOnly: boolean): Dataset {
   const captions = d.captions.filter((c) => !c.is_seed);
   const keepP = new Set(profiles.map((p) => p.id));
   const keepC = new Set(captions.map((c) => c.id));
-  const votes = d.votes.filter((v) => keepP.has(v.profile_id) && keepC.has(v.caption_id));
+  const votes = d.votes.filter((v) => !v.is_seed && keepP.has(v.profile_id) && keepC.has(v.caption_id));
   return { profiles, images, captions, votes };
 }
 
