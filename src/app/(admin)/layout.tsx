@@ -8,7 +8,11 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { profile } = await requireAdmin();
+  const { profile, supabase } = await requireAdmin();
+  const { count: pendingCount } = await supabase
+    .from("community_posts")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "pending");
 
   return (
     <div className="min-h-screen md:grid md:grid-cols-[232px_1fr]">
@@ -18,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <LaughMeter size={34} />
             <span className="font-display text-xl font-extrabold leading-none">Laugh Track</span>
           </Link>
-          <Nav />
+          <Nav pendingCount={pendingCount ?? 0} />
           <div className="hidden md:block mt-auto border-t border-line pt-4">
             <div className="flex items-center gap-2.5">
               {profile.avatar_url ? (
